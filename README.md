@@ -46,26 +46,26 @@ This file contains a cleaner and more structured version of the raw data. Some n
 
 Each row represents one TV show.
 
-### Main Columns in shows_structured.csv
+### Main Columns in `shows_structured.csv`
 
 | Column | Description |
 |---|---|
-| show_id | Unique ID of the TV show |
-| name | Name of the TV show |
-| type | Type of show, such as Scripted or Reality |
-| language | Original language of the show |
-| genres | Genres related to the show |
-| status | Current status of the show |
-| runtime | Runtime of the show in minutes |
-| average_runtime | Average runtime in minutes |
-| premiered | Date when the show first premiered |
-| ended | Date when the show ended, if available |
-| official_site | Official website of the show |
-| rating_average | Average rating of the show |
-| network_name | Name of the network that aired the show |
-| country_name | Country of the network |
-| country_code | Country code of the network |
-| summary | Short description of the show |
+| `show_id` | Unique ID of the TV show |
+| `name` | Name of the TV show |
+| `type` | Type of show, such as Scripted or Reality |
+| `language` | Original language of the show |
+| `genres` | Genres related to the show |
+| `status` | Current status of the show |
+| `runtime` | Runtime of the show in minutes |
+| `average_runtime` | Average runtime in minutes |
+| `premiered` | Date when the show first premiered |
+| `ended` | Date when the show ended, if available |
+| `official_site` | Official website of the show |
+| `rating_average` | Average rating of the show |
+| `network_name` | Name of the network that aired the show |
+| `country_name` | Country of the network |
+| `country_code` | Country code of the network |
+| `summary` | Short description of the show |
 
 ## Data Types Overview
 
@@ -99,10 +99,10 @@ Examples from this dataset:
 
 | Measurement Type | Columns |
 |---|---|
-| Nominal | name, type, language, genres, status, network_name, country_name |
-| Ordinal | rating_average, because ratings can be ranked from lower to higher |
-| Interval | premiered and ended dates, because they can be used to compare time periods |
-| Ratio | runtime and average_runtime, because they have a true zero and can be compared mathematically |
+| Nominal | `name`, `type`, `language`, `genres`, `status`, `network_name`, `country_name` |
+| Ordinal | `rating_average`, because ratings can be ranked from lower to higher |
+| Interval | `premiered` and `ended` dates, because they can be used to compare time periods |
+| Ratio | `runtime` and `average_runtime`, because they have a true zero and can be compared mathematically |
 
 ## Research Questions
 
