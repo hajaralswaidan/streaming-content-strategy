@@ -34,6 +34,8 @@ Since the API uses pages, I collected multiple pages using the `page` parameter 
 
 ## Dataset Description
 
+The dataset contains 750 TV show records collected from multiple pages of the TVMaze API.
+
 ### shows_raw.csv
 
 This file contains the raw data collected from the TVMaze API and saved as a CSV file. It keeps the original fields returned by the API, including some nested fields such as rating, network, schedule, externals, and links.
