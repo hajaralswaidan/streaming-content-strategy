@@ -22,10 +22,6 @@ By analyzing TV show data, the platform can make better decisions about content 
 
 ### TVMaze API
 
-## Data Sources
-
-### TVMaze API
-
 The data was collected from the TVMaze public API using API requests. TVMaze provides TV show information in JSON format, including show names, types, languages, genres, ratings, runtime, premiere dates, status, networks, countries, and summaries.
 
 I selected this API because it is public, easy to access, does not require an API key, and provides useful TV show data for a streaming platform case study.
@@ -76,6 +72,29 @@ Each row represents one TV show.
 | `country_name` | Country of the network |
 | `country_code` | Country code of the network |
 | `summary` | Short description of the show |
+
+
+## Sample Output
+
+After collecting and structuring the data, the final structured dataset contains:
+
+| File | Number of Records | Description |
+|---|---:|---|
+| `shows_raw.csv` | 750 | Raw TV show data collected from the TVMaze API |
+| `shows_structured.csv` | 750 | Structured TV show data with selected and extracted columns |
+
+Sample columns from the structured dataset include:
+
+- `show_id`
+- `name`
+- `type`
+- `language`
+- `genres`
+- `runtime`
+- `rating_average`
+- `network_name`
+- `country_name`
+
 
 ## Data Types Overview
 
@@ -181,6 +200,20 @@ The project includes the following files:
 - `data/raw/shows_raw.csv`
 - `data/raw/shows_structured.csv`
 - `README.md`
+
+## Insights Summary
+
+The insights section will be completed in Step 2 after performing data cleaning, analysis, and visualization.
+
+Expected insights may include:
+
+- Top-rated genres
+- Most common languages in the catalog
+- Relationship between runtime and rating
+- Networks with the highest-rated shows
+- Content trends based on premiere dates
+- Recommended content types to prioritize
+
 
 ## Current Step
 
