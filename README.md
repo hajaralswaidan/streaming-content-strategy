@@ -22,6 +22,10 @@ By analyzing TV show data, the platform can make better decisions about content 
 
 ### TVMaze API
 
+## Data Sources
+
+### TVMaze API
+
 The data was collected from the TVMaze public API using API requests. TVMaze provides TV show information in JSON format, including show names, types, languages, genres, ratings, runtime, premiere dates, status, networks, countries, and summaries.
 
 I selected this API because it is public, easy to access, does not require an API key, and provides useful TV show data for a streaming platform case study.
@@ -31,6 +35,10 @@ API endpoint used:
 https://api.tvmaze.com/shows?page={page_number}
 
 Since the API uses pages, I collected multiple pages using the `page` parameter to make sure the dataset contains at least 500 records.
+
+The final dataset contains 750 TV show records.
+
+Date of data collection: May 3, 2026.
 
 ## Dataset Description
 
@@ -121,7 +129,7 @@ The following questions will help guide the analysis and support content strateg
 
 ### Data Collection Approach
 
-The data was collected using Python API requests from the TVMaze public API. Since the API is paginated, multiple pages were requested using the `page` parameter to collect at least 500 TV show records.
+The data was collected using Python API requests from the TVMaze public API. Since the API is paginated, multiple pages were requested using the `page` parameter. The final dataset contains 750 TV show records.
 
 The API returned the data in JSON format. After that, the JSON response was converted into Pandas DataFrames.
 
