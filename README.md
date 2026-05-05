@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project is about collecting TV show data from the TVMaze API and preparing it in a structured format for analysis. The data is used to understand TV show content, such as genres, languages, ratings, runtime, networks, episode counts, and release dates.
+This project is about collecting TV show data from the TVMaze API and preparing it in a structured format for analysis. The data is used to understand TV show content, such as genres, languages, ratings, runtime, networks, episode counts, summaries, and release dates.
 
 The main goal is to support business decisions for a streaming platform. As the founder of the platform, I want to use data to decide which types of content should be promoted, licensed, or prioritized in the future.
 
@@ -80,7 +80,7 @@ Each row represents one TV show.
 
 ### shows_cleaned.csv
 
-This file contains the final cleaned and feature-engineered dataset produced in Step 2. It includes the structured columns plus new features created during cleaning, feature engineering, sentiment analysis, clustering, and external API integration.
+This file contains the final cleaned and feature-engineered dataset produced in Step 2. It includes the structured columns plus new features created during cleaning, feature engineering, sentiment analysis, keyword extraction, readability analysis, topic modeling, clustering, PCA, and external API integration.
 
 Each row represents one TV show.
 
@@ -116,12 +116,19 @@ Each row represents one TV show.
 | `genre_count` | Number of genres assigned to the show |
 | `summary_word_count` | Number of words in the cleaned summary |
 | `summary_character_count` | Number of characters in the cleaned summary |
-| `rating_category` | Rating group: Low, Medium, or High |
+| `summary_keywords` | Important keywords extracted from the cleaned show summary |
+| `sentence_count` | Number of sentences in the cleaned show summary |
+| `average_sentence_length` | Average number of words per sentence in the cleaned show summary |
+| `average_word_length` | Average length of words in the cleaned show summary |
 | `sentiment_score` | Sentiment polarity score of the show summary, ranging from -1 to +1 |
 | `sentiment_label` | Sentiment category: Positive, Neutral, or Negative |
+| `summary_topic` | Topic number assigned using topic modeling on the cleaned show summary |
+| `rating_category` | Rating group: Low, Medium, or High |
 | `content_cluster` | Content segment assigned by KMeans clustering based on selected numerical features |
 | `episode_count` | Number of episodes collected from the TVMaze Episodes API |
 | `episode_count_category` | Category based on episode count: Short, Medium, Long, or Very Long |
+| `pca_component_1` | First PCA component created from selected standardized numerical features |
+| `pca_component_2` | Second PCA component created from selected standardized numerical features |
 
 ## Sample Output
 
@@ -151,8 +158,10 @@ Examples from this dataset:
 - Network name
 - Country name
 - Summary
-- Rating category
+- Summary keywords
 - Sentiment label
+- Summary topic
+- Rating category
 - Content cluster
 - Episode count category
 
@@ -170,17 +179,21 @@ Examples from this dataset:
 - Genre count
 - Summary word count
 - Summary character count
+- Sentence count
+- Average sentence length
+- Average word length
 - Sentiment score
 - Episode count
+- PCA components
 
 ### Measurement Types
 
 | Measurement Type | Columns |
 |---|---|
-| Nominal | `name`, `type`, `language`, `genres`, `status`, `network_name`, `country_name`, `sentiment_label`, `content_cluster`, `episode_count_category` |
-| Ordinal | `rating_category`, because it groups shows into Low, Medium, and High |
-| Interval | `premiered` and `ended` dates, because they can be used to compare time periods |
-| Ratio | `runtime`, `average_runtime`, `show_age`, `genre_count`, `summary_word_count`, `summary_character_count`, `sentiment_score`, and `episode_count` |
+| Nominal | `name`, `type`, `language`, `genres`, `status`, `network_name`, `country_name`, `summary_keywords`, `sentiment_label`, `summary_topic`, `content_cluster` |
+| Ordinal | `rating_category`, `episode_count_category` |
+| Interval | `premiered`, `ended`, `sentiment_score`, `pca_component_1`, `pca_component_2` |
+| Ratio | `runtime`, `average_runtime`, `show_age`, `genre_count`, `summary_word_count`, `summary_character_count`, `sentence_count`, `average_sentence_length`, `average_word_length`, and `episode_count` |
 
 ## Research Questions
 
@@ -232,7 +245,7 @@ The final structured dataset from Step 1 was saved as `shows_structured.csv`.
 | NumPy | Used for numerical operations |
 | Matplotlib | Used to create visualizations |
 | TextBlob | Used for sentiment analysis on show summaries |
-| scikit-learn | Used for KMeans clustering |
+| scikit-learn | Used for StandardScaler, KMeans clustering, PCA, TF-IDF, and NMF topic modeling |
 | Jupyter Notebook | Used to document and run the full workflow |
 | TVMaze API | Main data source for show and episode data |
 
@@ -242,7 +255,7 @@ The final structured dataset from Step 1 was saved as `shows_structured.csv`.
 
 ## Data Processing & Cleaning
 
-The dataset was inspected before cleaning to understand its structure, data types, missing values, and duplicate records.
+The dataset was inspected before cleaning to understand its structure, data types, missing values, duplicate records, irrelevant features, and inconsistent values.
 
 The following cleaning steps were applied:
 
@@ -258,6 +271,8 @@ The following cleaning steps were applied:
 | Missing numerical values | Filled missing values in `runtime`, `average_runtime`, and `rating_average` using the median |
 | Ended column | Kept missing values in `ended` because missing end dates may indicate that the show is still running |
 | Text cleaning | Removed HTML tags from the `summary` column |
+| Irrelevant and inconsistent features review | Reviewed the dataset columns and kept features useful for content strategy analysis. Missing or inconsistent fields were handled based on their meaning |
+| Standardization | Numerical features used for KMeans clustering and PCA were standardized using `StandardScaler` so each feature contributes more equally to the process |
 
 After cleaning and feature engineering, the final cleaned dataset was saved as `data/cleaned/shows_cleaned.csv`.
 
@@ -276,14 +291,46 @@ The created features include:
 | `genre_count` | Counts how many genres are assigned to each show |
 | `summary_word_count` | Counts the number of words in the cleaned show summary |
 | `summary_character_count` | Counts the number of characters in the cleaned show summary |
-| `rating_category` | Groups shows into Low, Medium, and High rating categories |
+| `summary_keywords` | Extracts important keywords from the cleaned show summary |
+| `sentence_count` | Counts the number of sentences in the cleaned show summary |
+| `average_sentence_length` | Calculates the average number of words per sentence |
+| `average_word_length` | Calculates the average word length in the cleaned show summary |
 | `sentiment_score` | Calculates the sentiment polarity of each cleaned show summary using TextBlob |
 | `sentiment_label` | Classifies the summary sentiment as Positive, Neutral, or Negative |
+| `summary_topic` | Groups show summaries into general topics using topic modeling |
+| `rating_category` | Groups shows into Low, Medium, and High rating categories |
 | `content_cluster` | Groups shows into content segments using KMeans clustering |
 | `episode_count` | Counts the number of episodes for each show using the TVMaze Episodes API |
 | `episode_count_category` | Groups shows into Short, Medium, Long, and Very Long categories based on episode count |
+| `pca_component_1` | First PCA component created from selected standardized numerical features |
+| `pca_component_2` | Second PCA component created from selected standardized numerical features |
 
-Text-based feature engineering was applied to the `summary` column. HTML tags were removed, and word count, character count, sentiment score, and sentiment label features were created to convert text into useful analytical features.
+Text-based feature engineering was applied to the `summary` column. HTML tags were removed, and word count, character count, keyword extraction, readability features, topic modeling, sentiment score, and sentiment label features were created to convert text into useful analytical features.
+
+### Feature Engineering Documentation
+
+| Technique | What was done | Why it was necessary | How it was implemented |
+|---|---|---|---|
+| Date-based features | Created `premiere_year` and `premiere_month` | To analyze release trends over time | Extracted year and month from the `premiered` datetime column |
+| Derived metrics | Created `show_age` and `genre_count` | To measure how old each show is and how diverse its genres are | Calculated show age using the premiere year and counted genres by splitting the genre list |
+| Rating classification | Created `rating_category` | To group shows into easier rating levels for analysis | Used rating ranges to classify shows as Low, Medium, or High |
+| Text-based counting features | Created `summary_word_count` and `summary_character_count` | To convert summary text into numerical features | Cleaned the summary text and counted words and characters |
+| Language and readability features | Created `sentence_count`, `average_sentence_length`, and `average_word_length` | To describe the length and complexity of show summaries | Used text splitting and regular expressions to calculate sentence count, average sentence length, and average word length |
+| Keyword extraction | Created `summary_keywords` | To identify important terms and themes from show summaries | Removed common stop words and extracted the most frequent meaningful words from each cleaned summary |
+| Sentiment analysis | Created `sentiment_score` and `sentiment_label` | To capture the general tone of each show summary | Used TextBlob to calculate sentiment polarity and assign sentiment labels |
+| Topic modeling | Created `summary_topic` | To identify general themes from show summaries | Applied TF-IDF vectorization and NMF topic modeling on the cleaned summary text |
+| Clustering | Created `content_cluster` | To group shows into content segments based on numerical patterns | Standardized selected numerical features using `StandardScaler` and applied KMeans clustering |
+| PCA dimensionality reduction | Created `pca_component_1` and `pca_component_2` | To reduce selected numerical features into two components for exploratory analysis | Standardized selected numerical features and applied PCA with two components |
+| External API enrichment | Created `episode_count` and `episode_count_category` | To add content volume information that was not available in the original show-level dataset | Requested the TVMaze Episodes API for each show ID and counted the number of returned episodes |
+
+### Notes on Techniques Not Applied
+
+Some techniques mentioned in the task were reviewed but not applied because they were not suitable for this dataset.
+
+| Technique | Reason |
+|---|---|
+| Hashtag, mention, and emoji detection | These techniques were not applied because the dataset does not contain social media text, hashtags, mentions, or emojis. |
+| Advanced readability metrics | Basic readability-related features were created using sentence count, average sentence length, and average word length. More advanced readability metrics can be added in future work if deeper text analysis is needed. |
 
 ### External Data Integration
 
@@ -409,9 +456,9 @@ For the streaming platform, this may indicate stronger content continuity and be
 | Missing Values | Some shows did not have complete information, such as ratings, network details, official websites, genres, or ended dates. These missing values were handled based on the meaning of each column. |
 | Pagination | The API returns data in pages, so multiple pages were collected to make sure the dataset contains more than 500 records. |
 | Imbalanced Representation | The dataset is highly concentrated around English-language shows and Scripted content. This imbalance was considered during the bias and fairness evaluation. |
-| Text Cleaning | The `summary` column originally contained HTML tags. These tags were removed before creating text-based features such as word count, character count, sentiment score, and sentiment label. |
+| Text Cleaning | The `summary` column originally contained HTML tags. These tags were removed before creating text-based features such as word count, character count, readability features, keyword extraction, topic modeling, sentiment score, and sentiment label. |
 | External API Requests | Collecting episode counts required sending an API request for each show. This step took longer than the original data collection because each show needed a separate request to the TVMaze Episodes API. |
-| Feature Engineering Scope | Some advanced feature engineering steps, such as sentiment analysis, clustering, and episode count categorization, were applied in a simple way to support analysis. These features should be interpreted as exploratory and not as final production-ready model outputs. |
+| Feature Engineering Scope | Advanced feature engineering steps, such as sentiment analysis, topic modeling, PCA, clustering, and episode count categorization, were applied in a simple exploratory way. These features should be interpreted as analytical support features, not final production-ready model outputs. |
 
 ## Future Steps
 
