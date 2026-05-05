@@ -249,6 +249,50 @@ The final structured dataset from Step 1 was saved as `shows_structured.csv`.
 | Jupyter Notebook | Used to document and run the full workflow |
 | TVMaze API | Main data source for show and episode data |
 
+
+## Generated Files
+
+The project files are organized as follows:
+
+```text
+streaming-content-strategy/
+│
+├── tvmaze_api_data_collection.ipynb
+├── tvmaze_cleaning.ipynb
+├── README.md
+│
+├── data/
+│   ├── raw/
+│   │   ├── shows_raw.csv
+│   │   └── shows_structured.csv
+│   │
+│   └── cleaned/
+│       └── shows_cleaned.csv
+│
+└── images/
+    ├── show_types.png
+    ├── languages.png
+    ├── genres.png
+    ├── genre_ratings.png
+    ├── Average_Rating_Minimum.png
+    ├── runtime_rating.png
+    ├── premiere_trends.png
+    ├── networks.png
+    ├── rating_categories.png
+    └── episode_count.png
+```
+
+### Folder Description
+
+| Folder / File | Description |
+|---|---|
+| `tvmaze_api_data_collection.ipynb` | Notebook used to collect data from the TVMaze Shows API |
+| `tvmaze_cleaning.ipynb` | Notebook used for data cleaning, feature engineering, EDA, and bias evaluation |
+| `README.md` | Project documentation |
+| `data/raw/` | Contains the original raw and structured datasets from Step 1 |
+| `data/cleaned/` | Contains the final cleaned and feature-engineered dataset |
+| `images/` | Contains visualization screenshots used in the README |
+
 ---
 
 ## Step 2: Data Processing, Cleaning, Feature Engineering, and EDA
@@ -485,49 +529,6 @@ For the streaming platform, this may indicate stronger content continuity and be
 - A clustering analysis to group shows into content segments for targeted promotion.
 - A time series analysis to identify trends in TV show production and genre popularity over time.
 - A fairness-focused analysis that compares recommendations across languages, countries, and content types.
-
-## Generated Files
-
-The project files are organized as follows:
-
-```text
-streaming-content-strategy/
-│
-├── tvmaze_api_data_collection.ipynb
-├── tvmaze_cleaning.ipynb
-├── README.md
-│
-├── data/
-│   ├── raw/
-│   │   ├── shows_raw.csv
-│   │   └── shows_structured.csv
-│   │
-│   └── cleaned/
-│       └── shows_cleaned.csv
-│
-└── images/
-    ├── show_types.png
-    ├── languages.png
-    ├── genres.png
-    ├── genre_ratings.png
-    ├── Average_Rating_Minimum.png
-    ├── runtime_rating.png
-    ├── premiere_trends.png
-    ├── networks.png
-    ├── rating_categories.png
-    └── episode_count.png
-```
-
-### Folder Description
-
-| Folder / File | Description |
-|---|---|
-| `tvmaze_api_data_collection.ipynb` | Notebook used to collect data from the TVMaze Shows API |
-| `tvmaze_cleaning.ipynb` | Notebook used for data cleaning, feature engineering, EDA, and bias evaluation |
-| `README.md` | Project documentation |
-| `data/raw/` | Contains the original raw and structured datasets from Step 1 |
-| `data/cleaned/` | Contains the final cleaned and feature-engineered dataset |
-| `images/` | Contains visualization screenshots used in the README |
 
 ## Current Step
 
