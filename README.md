@@ -165,20 +165,17 @@ streaming-content-strategy/
 
 ## Tools and Libraries
 
-| Tool / Library | Purpose |
-|---|---|
-| Python | Data collection, cleaning, and analysis |
-| Requests | API requests |
-| Pandas | Data manipulation and cleaning |
-| NumPy | Numerical operations |
-| Plotly | Visualizations |
-| TextBlob | Sentiment analysis |
-| scikit-learn | TF-IDF, NMF, StandardScaler, KMeans, and PCA |
-| Jupyter Notebook | Running and documenting the workflow |
-| TVMaze API | Main data source |
-
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=FFD43B)
+![Requests](https://img.shields.io/badge/Requests-20232A?style=for-the-badge&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)
+![TextBlob](https://img.shields.io/badge/TextBlob-4B8BBE?style=for-the-badge&logo=python&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
+![NLTK](https://img.shields.io/badge/NLTK-154F5B?style=for-the-badge&logo=python&logoColor=white)
+![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white)
+![Structured Data](https://img.shields.io/badge/Structured%20Data-0F9D58?style=for-the-badge&logo=googlebigquery&logoColor=white)
 ---
-
 ## How to Run
 
 Run the notebooks in this order:

@@ -241,7 +241,7 @@ The dataset columns were classified into five measurement types: Categorical, No
 
 | Column | Measurement Type | Explanation |
 |---|---|---|
-| `show_id` | Categorical | Unique identifier for each TV show. It is numeric but not used for mathematical analysis. |
+| `show_id` | Nominal | Unique identifier for each TV show. Although stored as a numeric value, it is not used for numerical or mathematical analysis. |
 | `name` | Categorical | Name of the TV show. |
 | `type` | Nominal | Type of show, such as Scripted or Reality. |
 | `language` | Nominal | Original language of the show. |
@@ -261,15 +261,15 @@ The dataset columns were classified into five measurement types: Categorical, No
 
 ### 8.4 Notes on Measurement Types
 
-`show_id` is classified as categorical because it is only an identifier, even though it appears as a number.
+`show_id` is classified as nominal because it is only used for identification purposes and does not represent a measurable quantity.
 
-Most text-based columns are classified as categorical or nominal because they describe names, labels, or groups without a natural order.
+Most text-based columns are classified as nominal because they describe names, labels, or groups without a natural order.
 
 There are no ordinal columns in the structured dataset at this stage. Ordinal features such as `rating_category` and `episode_count_category` are created later during the cleaning and feature engineering process.
 
 Date columns such as `premiered` and `ended` are classified as interval because they can be used to analyze time differences and trends.
 
-Numerical columns such as `runtime`, `average_runtime`, and `rating_average` are classified as ratio because they represent measurable values that can be compared mathematically.
+Numerical columns such as `runtime`, `average_runtime`, and `rating_average` are classified as ratio because they represent measurable values with a meaningful zero and can be compared mathematically.
 ---
 
 ## 9. Research Questions

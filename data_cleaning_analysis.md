@@ -35,16 +35,24 @@ Each cleaning decision was based on the meaning of the column and how it would b
 | `country_name` | Filled missing values with `Unknown` | Avoids creating incorrect country information. |
 | `country_code` | Filled missing values with `Unknown` | Keeps missing country codes clear. |
 | `official_site` | Filled missing values with `Not Available` | Clearly shows that no official website was provided. |
-| `runtime` | Filled missing values using median imputation | Median is less affected by extreme values than the mean. |
-| `average_runtime` | Filled missing values using median imputation | Preserves the column for analysis while reducing the effect of outliers. |
-| `rating_average` | Filled missing values using median imputation | Keeps records available for rating analysis. |
+| `runtime` | Filled missing values using median imputation | Selected after reviewing numerical distribution and outlier sensitivity. |
+| `average_runtime` | Filled missing values using median imputation | Used to preserve the column while reducing sensitivity to extreme values. |
+| `rating_average` | Filled missing values using median imputation | Used to keep rating records available for analysis with a robust replacement value. |
 | `summary` | Removed HTML tags | Needed before keyword extraction, sentiment analysis, and topic modeling. |
+
 
 After cleaning and feature engineering, the final cleaned dataset was saved as:
 
 ```text
 data/cleaned/shows_cleaned.csv
 ```
+### Justification for Median Imputation
+
+Median imputation was used for the numerical columns `runtime`, `average_runtime`, and `rating_average` because these features may contain unusual or extreme values. The median is more robust than the mean because it is less affected by very high or very low values.
+
+Mean imputation was considered, but it was not selected because it could shift the replacement value toward extreme observations. This is important for TV show data because some shows may have unusually long runtimes or uncommon rating values.
+
+For `runtime`, grouped median imputation based on genre was also considered. However, a global median was used in this version to keep the cleaning process consistent and simple for exploratory analysis. This decision was documented so it can be improved in future work if a more detailed preprocessing approach is needed.
 
 ---
 
@@ -58,7 +66,9 @@ Outlier detection was applied to the main numerical columns:
 
 The method used was the **IQR Method**.
 
-Outliers were reviewed but not removed automatically because some unusual values may represent valid TV show characteristics, such as longer runtimes or special show formats.
+The detected outliers were reviewed before making any removal decision. They were not removed automatically because some unusual values may still represent valid TV show characteristics, such as special episodes, long-running shows, or uncommon runtime formats.
+
+The purpose of detecting outliers was to understand the data quality and identify values that may affect numerical analysis, not necessarily to delete them. Therefore, outlier results were kept and reviewed as part of the preprocessing process.
 
 ---
 
@@ -79,7 +89,24 @@ The following methods and models were used during cleaning, feature engineering,
 | PCA | Selected standardized numerical features were reduced into two components. | To simplify numerical features and support exploratory analysis using fewer dimensions. | `pca_component_1`, `pca_component_2` |
 | TVMaze Episodes API | Episode data was collected for each show using `show_id`. | To add content volume information that was not available in the original show-level dataset. | `episode_count`, `episode_count_category` |
 
-### 5.1 Sentiment Analysis
+### 5.1 NLP Techniques
+
+Natural Language Processing (NLP) techniques were used because the dataset includes textual descriptions in the `summary` column. These summaries were not directly suitable for analysis in their raw form, so they were cleaned and transformed into useful text-based features.
+
+The text preprocessing step included removing HTML tags, converting text to lowercase, removing punctuation, removing stopwords, and handling missing summaries. This helped reduce noise and make the summaries more consistent before applying text analysis methods.
+
+After preprocessing, several NLP techniques were applied:
+
+- **Keyword Extraction:** Used to identify important and frequently appearing words in show summaries.
+- **TF-IDF Vectorization:** Used to convert the cleaned summary text into numerical features by giving more weight to meaningful terms and reducing the influence of common words.
+- **NMF Topic Modeling:** Used on the TF-IDF features to discover common topic patterns across show summaries.
+- **TextBlob Sentiment Analysis:** Used to calculate sentiment polarity and classify summaries as Positive, Neutral, or Negative.
+
+These NLP techniques helped convert unstructured text into structured analytical features such as `summary_keywords`, `summary_topic`, `sentiment_score`, and `sentiment_label`.
+
+The NLP results were used for exploratory analysis and feature engineering support, not as final predictive decision-making outputs.
+
+### 5.2 Sentiment Analysis
 
 Sentiment analysis was applied to the cleaned `summary` column using TextBlob.
 
@@ -92,7 +119,7 @@ The output was stored in:
 
 The `sentiment_score` represents the sentiment polarity of the summary, while `sentiment_label` classifies the result as Positive, Neutral, or Negative.
 
-### 5.2 Topic Modeling
+### 5.3 Topic Modeling
 
 Topic modeling was applied to the cleaned `summary` column to identify common themes in show descriptions.
 
@@ -114,18 +141,34 @@ The output was stored in:
 summary_topic
 ```
 
-### 5.3 Clustering
+### 5.4 Clustering
 
-KMeans clustering was applied to group shows into three content segments based on:
+Clustering was used to explore whether TV shows can be grouped into similar content segments based on two numerical features:
 
-- `rating_average`
 - `runtime`
+- `rating_average`
 
-Because KMeans is distance-based, the selected numerical features were standardized using `StandardScaler` before applying the clustering model.
+KMeans was selected because it can group records without predefined labels, which makes it suitable for exploratory analysis.
 
-The purpose of clustering was to explore whether shows can be grouped into different content segments based on rating and runtime patterns.
+Before applying KMeans, `StandardScaler` was used to standardize the selected features. This step was necessary because `runtime` and `rating_average` are measured on different numerical scales. Without scaling, `runtime` could have a stronger influence on the clustering results.
 
-The benefit of this feature is that it can help the streaming platform compare groups of shows instead of analyzing each show individually. For example, it can help identify groups of shows with similar rating and runtime characteristics.
+During experimentation, multiple cluster counts were tested, including 2, 3, 4, and 5 clusters.
+
+The results with 2 clusters were too general and did not clearly separate different content patterns. On the other hand, using 4 or 5 clusters produced more fragmented groups that were harder to interpret during exploratory analysis.
+
+For this reason, 3 clusters were selected because they provided the clearest and most meaningful grouping structure for the dataset.
+
+The clustering results revealed noticeable differences between the generated content groups:
+
+- **Cluster 0** mainly contained shorter shows with relatively good ratings. Comedy and family-related genres appeared more frequently in this group, and the shows also had a higher average episode count.
+
+- **Cluster 1** contained longer shows with the lowest average rating among the clusters. Drama-related genres appeared more frequently in this group, and it also showed the highest average episode count.
+
+- **Cluster 2** contained shows with the highest average ratings and longer runtimes. This cluster also showed higher genre diversity compared to the other groups.
+
+These clustering patterns helped provide a clearer understanding of different content characteristics across the dataset instead of analyzing each show individually.
+
+This step was not intended to build a final production-ready segmentation model. Instead, it was used as an exploratory technique to better understand content patterns and support content strategy analysis.
 
 The output was stored in:
 
@@ -133,13 +176,22 @@ The output was stored in:
 content_cluster
 ```
 
-### 5.4 PCA
 
-PCA was applied to reduce selected standardized numerical features into two components.
+### 5.5 PCA
 
-The purpose of PCA was to simplify multiple numerical features into fewer components while keeping useful variation from the data.
+PCA was applied to reduce selected standardized numerical features into two components for exploratory analysis and visualization.
 
-The benefit of PCA is that it supports exploratory analysis by making complex numerical patterns easier to review and compare.
+Before applying PCA, the numerical features were standardized because PCA is sensitive to feature scale differences. Standardization helps ensure that features with larger numeric ranges do not dominate the resulting components.
+
+To better understand the dimensional structure of the data, cumulative explained variance was reviewed before selecting the number of components.
+
+The first two PCA components explained approximately 50% of the total variance in the selected numerical features.
+
+Although additional PCA components could increase the explained variance, two components were selected because the primary goal of PCA in this project was exploratory visualization and pattern inspection. Using two components made it possible to represent the data in a simple two-dimensional form that is easier to visualize and interpret during exploratory analysis.
+
+Correlation analysis showed that both PCA components were more strongly associated with runtime-related variation compared to rating variation. The components also captured smaller relationships with genre diversity and episode-related characteristics.
+
+These PCA components were used only for exploratory analysis and visualization support. They were not intended to serve as final predictive modeling features or business decision variables.
 
 The output was stored in:
 
@@ -147,8 +199,6 @@ The output was stored in:
 pca_component_1
 pca_component_2
 ```
-
-These components were used as exploratory analytical features, not as final business decision variables.
 
 ---
 
