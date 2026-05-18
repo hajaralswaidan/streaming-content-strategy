@@ -41,46 +41,6 @@ Detailed documentation is separated into the following files:
 - [Data Collection and Preparation](data_collection.md)
 - [Data Cleaning, Feature Engineering, and Analysis](data_cleaning_analysis.md)
 
----
-
-## Data Sources
-
-| Source | Purpose |
-|---|---|
-| TVMaze Shows API | Collect TV show information such as name, type, language, genres, rating, runtime, premiere date, network, country, and summary |
-| TVMaze Episodes API | Collect episode information and create the `episode_count` feature |
-
-TVMaze API documentation:
-
-```text
-https://www.tvmaze.com/api
-```
-
----
-
-## Dataset Files
-
-| File | Records | Description |
-|---|---:|---|
-| `data/raw/shows_raw.csv` | 750 | Raw data collected from the TVMaze Shows API |
-| `data/raw/shows_structured.csv` | 750 | Structured dataset with selected and extracted columns |
-| `data/cleaned/shows_cleaned.csv` | 726 | Final cleaned and feature-engineered dataset used for analysis |
-
-The cleaned dataset has fewer records because rows with missing `premiered` values were removed. The premiere date is required for time-based analysis.
-
----
-
-## Research Questions
-
-This project focuses on the following questions:
-
-1. Which genres are most common in the TV show catalog?
-2. Which genres have the highest average ratings?
-3. Which languages are most common in the dataset?
-4. Is there a relationship between runtime and average rating?
-5. Which networks have the highest number of shows?
-6. How has TV show production changed over time?
-7. How can episode count help understand show length and content volume?
 
 ---
 
@@ -94,22 +54,8 @@ This project focuses on the following questions:
 | Feature Engineering | Created new features from dates, text, ratings, genres, summaries, and episode data |
 | External Data Integration | Used the TVMaze Episodes API to add episode count |
 | Exploratory Data Analysis | Analyzed genres, languages, ratings, runtime, networks, trends, and episode counts |
+| Classification Modeling | Applied Random Forest classification to predict TV show rating categories |
 | Bias Evaluation | Reviewed representation, measurement, historical, and missing data bias |
-
----
-
-## Applied Methods
-
-| Method / Model | Purpose |
-|---|---|
-| Median Imputation | Fill missing numerical values |
-| IQR Method | Detect numerical outliers |
-| Regular Expressions | Clean text and remove HTML tags |
-| TextBlob | Perform sentiment analysis on show summaries |
-| TF-IDF + NMF Topic Modeling | Create topic groups from show summaries |
-| StandardScaler + KMeans Clustering | Create content clusters based on rating and runtime |
-| PCA | Reduce selected numerical features into two components |
-| TVMaze Episodes API | Add episode count information |
 
 ---
 
@@ -158,7 +104,9 @@ streaming-content-strategy/
     ├── premiere_trends.png
     ├── networks.png
     ├── rating_categories.png
-    └── episode_count.png
+    ├── episode_count.png
+    ├── Confusion_Matrix_for_Rating_Category.png
+    └── Feature_Importance_in_RandomForest.png
 ```
 
 ---
@@ -175,6 +123,10 @@ streaming-content-strategy/
 ![NLTK](https://img.shields.io/badge/NLTK-154F5B?style=for-the-badge&logo=python&logoColor=white)
 ![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white)
 ![Structured Data](https://img.shields.io/badge/Structured%20Data-0F9D58?style=for-the-badge&logo=googlebigquery&logoColor=white)
+![Machine Learning](https://img.shields.io/badge/Machine%20Learning-102230?style=for-the-badge&logo=scikitlearn&logoColor=white)
+![Random Forest](https://img.shields.io/badge/Random%20Forest-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
+![NLP](https://img.shields.io/badge/NLP-4B8BBE?style=for-the-badge&logo=python&logoColor=white)
+
 ---
 ## How to Run
 
@@ -193,14 +145,3 @@ data/raw/shows_structured.csv
 data/cleaned/shows_cleaned.csv
 ```
 
----
-
-## Final Output
-
-The final cleaned and feature-engineered dataset is saved as:
-
-```text
-data/cleaned/shows_cleaned.csv
-```
-
-This dataset is ready for exploratory analysis, visualization, business insight generation, and possible future modeling.

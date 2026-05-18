@@ -2,9 +2,7 @@
 
 ## 1. Overview
 
-This document explains the data cleaning, feature engineering, exploratory data analysis, and bias evaluation process for the Streaming Platform Content Strategy project.
-
-The structured dataset collected from the TVMaze API was cleaned, enriched, and prepared for analysis. The goal is to make the dataset more useful for understanding TV show content patterns and supporting content strategy decisions for a streaming platform.
+This document explains the cleaning, preprocessing, feature engineering, exploratory analysis, and modeling process applied to the structured TVMaze dataset.
 
 ---
 
@@ -41,14 +39,14 @@ Each cleaning decision was based on the meaning of the column and how it would b
 | `summary` | Removed HTML tags | Needed before keyword extraction, sentiment analysis, and topic modeling. |
 
 
-After cleaning and feature engineering, the final cleaned dataset was saved as:
-
 ```text
 data/cleaned/shows_cleaned.csv
 ```
 ### Justification for Median Imputation
 
 Median imputation was used for the numerical columns `runtime`, `average_runtime`, and `rating_average` because these features may contain unusual or extreme values. The median is more robust than the mean because it is less affected by very high or very low values.
+
+Several numerical columns also showed uneven distributions, which made the median a more stable replacement choice compared to the mean.
 
 Mean imputation was considered, but it was not selected because it could shift the replacement value toward extreme observations. This is important for TV show data because some shows may have unusually long runtimes or uncommon rating values.
 
@@ -74,7 +72,7 @@ The purpose of detecting outliers was to understand the data quality and identif
 
 ## 5. Applied Methods and Models
 
-The following methods and models were used during cleaning, feature engineering, and analysis. These methods helped transform the dataset into a richer format that supports deeper analysis and business insight generation.
+The following methods and models were used during cleaning, feature engineering, and analysis. These methods helped transform the dataset into a richer format that supports deeper exploratory analysis and feature engineering.
 
 | Method / Model | What Was Done | Purpose / Benefit | Output |
 |---|---|---|---|
@@ -89,6 +87,7 @@ The following methods and models were used during cleaning, feature engineering,
 | PCA | Selected standardized numerical features were reduced into two components. | To simplify numerical features and support exploratory analysis using fewer dimensions. | `pca_component_1`, `pca_component_2` |
 | TVMaze Episodes API | Episode data was collected for each show using `show_id`. | To add content volume information that was not available in the original show-level dataset. | `episode_count`, `episode_count_category` |
 
+---
 ### 5.1 NLP Techniques
 
 Natural Language Processing (NLP) techniques were used because the dataset includes textual descriptions in the `summary` column. These summaries were not directly suitable for analysis in their raw form, so they were cleaned and transformed into useful text-based features.
@@ -104,9 +103,10 @@ After preprocessing, several NLP techniques were applied:
 
 These NLP techniques helped convert unstructured text into structured analytical features such as `summary_keywords`, `summary_topic`, `sentiment_score`, and `sentiment_label`.
 
-The NLP results were used for exploratory analysis and feature engineering support, not as final predictive decision-making outputs.
+The NLP outputs were mainly used to support feature engineering and text-based content analysis.
 
-### 5.2 Sentiment Analysis
+---
+#### 5.1.1 Sentiment Analysis
 
 Sentiment analysis was applied to the cleaned `summary` column using TextBlob.
 
@@ -119,7 +119,8 @@ The output was stored in:
 
 The `sentiment_score` represents the sentiment polarity of the summary, while `sentiment_label` classifies the result as Positive, Neutral, or Negative.
 
-### 5.3 Topic Modeling
+---
+#### 5.1.2 Topic Modeling
 
 Topic modeling was applied to the cleaned `summary` column to identify common themes in show descriptions.
 
@@ -140,8 +141,20 @@ The output was stored in:
 ```text
 summary_topic
 ```
+---
 
-### 5.4 Clustering
+### 5.2 External Data Integration
+
+Additional episode information was collected using the TVMaze Episodes API.
+
+For each TV show, the API was requested using the show_id, and the total number of returned episodes was counted and stored as a new feature called episode_count.
+
+An additional categorical feature called episode_count_category was also created to group shows based on content volume.
+
+These features helped support exploratory analysis and predictive modeling by providing information about show length and content volume.
+
+ ---
+ ### 5.3 Clustering
 
 Clustering was used to explore whether TV shows can be grouped into similar content segments based on two numerical features:
 
@@ -154,9 +167,13 @@ Before applying KMeans, `StandardScaler` was used to standardize the selected fe
 
 During experimentation, multiple cluster counts were tested, including 2, 3, 4, and 5 clusters.
 
-The results with 2 clusters were too general and did not clearly separate different content patterns. On the other hand, using 4 or 5 clusters produced more fragmented groups that were harder to interpret during exploratory analysis.
+The results with 2 clusters were too general and did not clearly separate different content patterns. On the other hand, using 4 or 5 clusters produced more fragmented groups that were harder to interpret.
 
-For this reason, 3 clusters were selected because they provided the clearest and most meaningful grouping structure for the dataset.
+For this reason, 3 clusters were selected because they provided the clearest and most interpretable grouping structure for exploratory analysis.
+
+The clustering results were evaluated mainly through visual inspection and cluster interpretability because the main goal was exploratory analysis rather than production optimization.
+
+![KMeans Clustering](images/KMeans_Clustering.png)
 
 The clustering results revealed noticeable differences between the generated content groups:
 
@@ -166,9 +183,7 @@ The clustering results revealed noticeable differences between the generated con
 
 - **Cluster 2** contained shows with the highest average ratings and longer runtimes. This cluster also showed higher genre diversity compared to the other groups.
 
-These clustering patterns helped provide a clearer understanding of different content characteristics across the dataset instead of analyzing each show individually.
-
-This step was not intended to build a final production-ready segmentation model. Instead, it was used as an exploratory technique to better understand content patterns and support content strategy analysis.
+These clustering patterns helped highlight meaningful differences in TV show characteristics across the dataset.
 
 The output was stored in:
 
@@ -176,22 +191,20 @@ The output was stored in:
 content_cluster
 ```
 
+---
+### 5.4 PCA
 
-### 5.5 PCA
-
-PCA was applied to reduce selected standardized numerical features into two components for exploratory analysis and visualization.
+Principal Component Analysis (PCA) was applied to reduce selected standardized numerical features into two components for exploratory analysis and visualization.
 
 Before applying PCA, the numerical features were standardized because PCA is sensitive to feature scale differences. Standardization helps ensure that features with larger numeric ranges do not dominate the resulting components.
 
 To better understand the dimensional structure of the data, cumulative explained variance was reviewed before selecting the number of components.
 
-The first two PCA components explained approximately 50% of the total variance in the selected numerical features.
+The first two PCA components explained approximately 50% of the total variance in the selected numerical features, which was considered sufficient for exploratory visualization and pattern inspection.
 
-Although additional PCA components could increase the explained variance, two components were selected because the primary goal of PCA in this project was exploratory visualization and pattern inspection. Using two components made it possible to represent the data in a simple two-dimensional form that is easier to visualize and interpret during exploratory analysis.
+Correlation analysis showed that both PCA components were more strongly associated with runtime-related variation compared to rating variation. Smaller relationships were also observed with genre diversity and episode-related characteristics.
 
-Correlation analysis showed that both PCA components were more strongly associated with runtime-related variation compared to rating variation. The components also captured smaller relationships with genre diversity and episode-related characteristics.
-
-These PCA components were used only for exploratory analysis and visualization support. They were not intended to serve as final predictive modeling features or business decision variables.
+The generated PCA features were retained only for exploratory analysis and visualization support.
 
 The output was stored in:
 
@@ -199,6 +212,57 @@ The output was stored in:
 pca_component_1
 pca_component_2
 ```
+---
+### 5.5 Classification Model
+
+A Random Forest classification model was applied to predict TV show rating categories using selected numerical and engineered features.
+
+The target variable used in this model was:
+
+- `rating_category`
+
+The model attempted to classify TV shows into:
+
+- Low
+- Medium
+- High
+
+Descriptive category labels were used instead of numeric category IDs to make the classification results easier to interpret during analysis and evaluation.
+
+The following features were selected as input variables for prediction:
+
+- `runtime`
+- `genre_count`
+- `episode_count`
+- `sentiment_score`
+- `summary_word_count`
+- `show_age`
+
+Random Forest was selected because it can handle numerical features effectively, manage nonlinear relationships, and provide feature importance information that helps interpret the prediction behavior.
+
+The dataset was divided into training and testing sets using an 80/20 split to evaluate the model performance on unseen data.
+
+The Random Forest model achieved an accuracy of approximately 82%, indicating that the selected features were reasonably effective in predicting general TV show rating categories.
+
+Model evaluation also included precision, recall, and F1-score to better understand the classification performance across the different rating groups.
+
+The model performed better when predicting the High rating category compared to the Low and Medium categories. This behavior was influenced by class imbalance in the dataset, where High-rated shows appeared more frequently than other rating groups.
+
+Training and testing accuracy were also compared to review possible overfitting behavior. The training accuracy reached 100%, while the testing accuracy remained around 82%, suggesting that the model learned the training data very well while still maintaining acceptable generalization performance on unseen data.
+
+Although the model was not intended for production deployment, it helped demonstrate how engineered numerical and text-based features can support predictive content analysis.
+
+#### Classification Metrics
+
+![Confusion Matrix](images/Confusion_Matrix_for_Rating_Category.png)
+
+The confusion matrix shows that the model achieved stronger prediction performance for the High rating category, while prediction performance for Low and Medium categories was weaker due to limited class representation.
+
+![Feature Importance](images/Feature_Importance%20in_RandomForest.png)
+
+Feature importance analysis showed that runtime, episode count, and summary-related features had stronger influence on the model predictions compared to some other numerical variables.
+
+The classification model was used to support predictive experimentation using engineered TV show features.
 
 ---
 
@@ -233,62 +297,44 @@ Text-based feature engineering was applied to the `summary` column after removin
 
 ---
 
-## 7. External Data Integration
-
-The original show-level dataset did not include episode count information.
-
-To enrich the dataset, the TVMaze Episodes API was used to collect episode data for each show based on its `show_id`.
-
-The number of returned episodes was counted and added as:
-
-```text
-episode_count
-```
-
-Then, `episode_count_category` was created to group shows into:
-
-- Short
-- Medium
-- Long
-- Very Long
-
-This feature helps analyze show length and content volume, which can support content strategy decisions.
-
----
-
-## 8. Exploratory Data Analysis
+## 7. Exploratory Data Analysis
 
 The EDA process included statistical summaries, visualizations, genre analysis, rating analysis, correlation analysis, trend analysis, network analysis, and episode count analysis.
 
 Interactive visualizations were created using Plotly and saved in the `images/` folder.
 
-### 8.1 Distribution of Show Types
+---
+### 7.1 Distribution of Show Types
 
 The majority of shows in the dataset are Scripted. Other types such as Reality, Animation, Documentary, Talk Show, and News appear much less frequently. This suggests that the dataset is strongly concentrated around scripted content.
 
 ![Distribution of Show Types](images/show_types.png)
 
-### 8.2 Distribution of Languages
+---
+### 7.2 Distribution of Languages
 
 The dataset is highly concentrated around English-language shows. This indicates a strong language imbalance that may affect recommendations and genre analysis.
 
 ![Distribution of Languages](images/languages.png)
 
-### 8.3 Most Common Genres
+---
+### 7.3 Most Common Genres
 
 Drama is the most common genre, followed by Comedy, Action, Crime, and Science-Fiction. The presence of `Unknown` in the genre data indicates that some shows did not have genre information available in the API.
 
 ![Most Common Genres](images/genres.png)
 
-### 8.4 Average Rating by Genre
+---
+### 7.4 Average Rating by Genre
 
 After filtering for genres with at least 10 shows, Medical, Crime, Mystery, War, and Adventure appear among the highest-rated genres. Drama and Action are among the most common but not necessarily the highest-rated genres.
 
 ![Average Rating by Genre](images/genre_ratings.png)
 
 ![Average Rating by Genre with Minimum 10 Shows](images/Average_Rating_Minimum.png)
+---
 
-### 8.5 Runtime and Rating Relationship
+### 7.5 Runtime and Rating Relationship
 
 The correlation between runtime and average rating is:
 
@@ -300,33 +346,36 @@ This indicates a very weak relationship. Runtime does not appear to be a strong 
 
 ![Runtime vs Rating](images/runtime_rating.png)
 
-### 8.6 Show Production Trends Over Time
+---
+### 7.6 Show Production Trends Over Time
 
 The number of premiered shows increased gradually over time, with a peak around 2014. The drop after the peak may reflect how the API data was collected rather than an actual decline in TV production.
 
 ![Show Production Trends](images/premiere_trends.png)
 
-### 8.7 Top Networks
+---
+### 7.7 Top Networks
 
 NBC, ABC, CBS, FOX, and HBO are the top networks by number of shows. The dataset is strongly represented by major U.S. networks.
 
 ![Top Networks](images/networks.png)
 
-### 8.8 Rating Category Distribution
+---
+### 7.8 Rating Category Distribution
 
 Most shows fall under the High rating category. However, this result should be interpreted carefully because missing ratings were filled using the median, which may affect the true rating distribution.
 
 ![Rating Category Distribution](images/rating_categories.png)
 
-### 8.9 Episode Count Category Distribution
+---
+### 7.9 Episode Count Category Distribution
 
 Medium and Long shows are the most common in the dataset, while Short and Very Long shows appear less frequently. This suggests that the catalog is mainly concentrated around shows with moderate to high episode counts.
 
 ![Episode Count Category Distribution](images/episode_count.png)
 
 ---
-
-## 9. Bias and Fairness Evaluation
+## 8. Bias and Fairness Evaluation
 
 Bias and fairness were considered because the dataset may not represent all content types, languages, or networks equally.
 
@@ -342,14 +391,19 @@ Some existing frameworks that can be used to support bias and fairness evaluatio
 | Measurement Bias | Some important fields contain missing values, such as `rating_average`, `network_name`, `genres`, and `official_site`. |
 | Historical Bias | The dataset reflects the TVMaze API records and selected collected pages, not necessarily the full TV market. |
 | Missing Data Bias | Missing values may affect comparisons between genres, networks, and content types. |
+| Survivorship Bias | Shows with higher popularity or longer runtimes are more likely to contain complete metadata, ratings, and summaries. Less popular or recently released shows may contain limited information, which could cause the analysis to emphasize well-documented content more heavily. |
+| Selection Bias | The dataset was collected from the TVMaze API, so the available records depend on the platform’s own coverage and available metadata. Certain genres, countries, or languages may appear more frequently than others, which can influence exploratory analysis results and content patterns. |
 
-These biases may affect the final insights and recommendations. For example, English scripted content may appear more important mainly because it is highly represented in the dataset.
+---
+For example, highly represented groups such as English-language scripted shows may appear more influential in the analysis mainly because they dominate the collected dataset.
+
+These biases may affect the final insights and recommendations.
 
 To reduce bias in future analysis, more pages, international content, and additional external data sources should be included.
 
 ---
 
-## 10. Key Challenges
+## 9. Key Challenges
 
 | Challenge | Description |
 |---|---|
@@ -363,7 +417,7 @@ To reduce bias in future analysis, more pages, international content, and additi
 
 ---
 
-## 11. Future Work
+## 10. Future Work
 
 Future work may include:
 
@@ -375,18 +429,6 @@ Future work may include:
 - Adding user engagement data such as views, watch time, and completion rates.
 - Building a recommendation model based on genre, rating, language, network, and episode count.
 - Comparing recommendations across languages, countries, and content types to reduce bias.
-
----
-
-## 12. Final Output
-
-The final cleaned and feature-engineered dataset was saved as:
-
-```text
-data/cleaned/shows_cleaned.csv
-```
-
-This dataset is ready for exploratory analysis, visualization, business insight generation, and possible future modeling.
 
 ---
 

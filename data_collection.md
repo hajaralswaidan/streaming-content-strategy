@@ -2,23 +2,15 @@
 
 ## 1. Project Overview
 
-This project focuses on collecting and preparing TV show data from the TVMaze public API to support content strategy decisions for a streaming platform.
-
-The dataset includes information about TV shows such as genres, languages, ratings, runtime, networks, premiere dates, summaries, and episode information. This data helps understand what types of content are available and which content areas may be useful for future promotion, licensing, or investment decisions.
-
-The main goal is to collect real-world data, transform the raw API response into a structured dataset, and prepare the data for cleaning, analysis, visualization, and business insight generation.
+This document explains the process of collecting and structuring TV show data from the TVMaze API before cleaning and analysis.
 
 ---
 
 ## 2. Business Context and Problem Statement
 
-The business is a growing streaming platform that provides TV shows to users. The target users are viewers who watch different types of content, such as drama, comedy, action, documentary, and other genres.
+The project focuses on collecting TV show data that can later support exploratory analysis and content strategy evaluation for streaming platforms.
 
-Streaming platforms need to choose their content carefully because content affects user engagement, user retention, and platform growth. Instead of making content decisions based only on assumptions, this project uses data to understand the available TV show catalog and identify useful patterns.
-
-The main business problem is deciding which types of content the streaming platform should focus on. Without data, the platform may invest in shows or genres that are not strong enough based on rating, availability, content volume, or market trends. This can lead to weak content acquisition decisions and lower user engagement.
-
-By collecting and preparing TV show data, the platform can later analyze content patterns and make better decisions about content acquisition, promotion, and future investment.
+The main objective of this stage is to transform raw API responses into a structured dataset ready for cleaning and analysis.
 
 ---
 
@@ -82,8 +74,7 @@ https://api.tvmaze.com/shows/1/episodes
 
 For each show, the Episodes API was requested using the show ID. The number of episodes returned by the API was counted and added later as a new feature called `episode_count`.
 
-This feature is useful because episode count helps analyze show length and content volume, which can support streaming content strategy decisions.
-
+This feature was later added during feature engineering as `episode_count`.
 ---
 
 ## 4. Data Collection Method
@@ -152,14 +143,6 @@ This file contains a structured version of the raw data. Important fields were s
 This file is easier to read and is used as the input for the cleaning and analysis process.
 
 Each row represents one TV show.
-
-### 6.3 Final Cleaned Dataset
-
-The final cleaned dataset, `shows_cleaned.csv`, was created later during the cleaning, feature engineering, and analysis process.
-
-This final dataset includes the structured columns plus additional features such as `episode_count`, `rating_category`, `sentiment_label`, `content_cluster`, and PCA components.
-
-The detailed explanation of these new features is included in the cleaning and analysis documentation.
 
 ---
 
@@ -288,21 +271,7 @@ These questions are specific, measurable, and useful for making streaming platfo
 
 ---
 
-## 10. Tools and Methods Used
-
-| Tool / Library | Purpose |
-|---|---|
-| Python | Main programming language used for data collection |
-| Requests | Used to send API requests to TVMaze |
-| Pandas | Used to convert JSON responses into DataFrames and save CSV files |
-| Jupyter Notebook | Used to document and run the data collection workflow |
-| TVMaze API | Main source of TV show and episode data |
-
-Additional tools were used later during cleaning, feature engineering, visualization, and analysis. These tools are documented in the cleaning and analysis file.
-
----
-
-## 11. Generated Data Files
+## 10. Generated Data Files
 
 The data collection and preparation process generated the following files:
 
@@ -316,7 +285,7 @@ The structured dataset is the main output of the collection and preparation proc
 
 ---
 
-## 12. Key Challenges and Solutions
+## 11. Key Challenges and Solutions
 
 | Challenge | Description | Solution |
 |---|---|---|
@@ -326,37 +295,7 @@ The structured dataset is the main output of the collection and preparation proc
 | Episode count not included in main endpoint | The Shows API does not directly provide the total number of episodes for each show. | The TVMaze Episodes API was used later to collect episode count by show ID. |
 | API request time | Collecting episode information requires a separate request for each show. | Requests were handled using a loop, and the collected episode counts were added during feature engineering. |
 
----
 
-## 13. Collection Outputs and Connection to Analysis
-
-After the data collection and preparation process, the main structured dataset was ready for cleaning, feature engineering, exploratory data analysis, and business insight generation.
-
-The main output of the collection process is:
-
-```text
-data/raw/shows_structured.csv
-```
-
-This file is used as the input dataset for the cleaning and analysis notebook.
-
-During the cleaning and feature engineering process, additional features were created, including:
-
-- `episode_count`
-- `rating_category`
-- `sentiment_label`
-- `summary_topic`
-- `content_cluster`
-- `pca_component_1`
-- `pca_component_2`
-
-The final cleaned dataset was saved as:
-
-```text
-data/cleaned/shows_cleaned.csv
-```
-
-This keeps the data workflow clear: the raw API data was first collected and structured, then the structured dataset was cleaned and enriched for analysis.
 ---
 
 ## Related Documentation
